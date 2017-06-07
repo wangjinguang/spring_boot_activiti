@@ -1,0 +1,2 @@
+id;login;password;name;email;activated;lang_key;created_by;last_modified_by;tenancy_code
+1;admin;$2a$10$oqUA4eCrGrVZJLdk2O9nhO8KM6W57hWaAG40g9bAez7udYcwiQdVG;Administrator;admin@localhost;true;zh-cn;system;system;admin
