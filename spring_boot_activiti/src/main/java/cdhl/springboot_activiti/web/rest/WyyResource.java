@@ -127,6 +127,25 @@ public class WyyResource {
     }
 
     /**
+     * 指派代办任务
+     *
+     * @return
+     */
+    @RequestMapping(value = "/claim",
+        method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Void> claimWork(String taskId,String userId) throws URISyntaxException {
+        log.info("claim method run taskId="+taskId+" userId="+userId);
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (StringUtils.isBlank(task.getAssignee())){
+            taskService.claim(taskId,userId);//现在这个任务成为了任务领取者的个人任务了
+        }
+
+        return ResponseEntity.ok().build();
+    }
+    
+    /**
      * 处理代办任务
      *
      * @return
@@ -142,9 +161,10 @@ public class WyyResource {
                 map.put(keys[i],values[i]);
             }
         }
+        log.info("doneWork method run taskId="+taskId+" keys="+keys+" values="+values);
         Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
         if (StringUtils.isBlank(task.getAssignee())){
-            taskService.claim(taskId,userService.getUserWithAuthorities().getId().toString());
+            taskService.claim(taskId,userService.getUserWithAuthorities().getId().toString());//现在这个任务成为了任务领取者的个人任务了
         }
         taskService.complete(taskId,map);
 

@@ -43,7 +43,7 @@ function WorkflowController ($scope,$http,$state,layer,Upload) {
     var runing_cellTemplate2='<a ng-click="grid.appScope.reviewImage2(row)">{{COL_FIELD}}</a>';
 
     var runing_colModel=[
-        { field: 'id',displayName: '操作', width: '15%', cellTemplate:runing_cellTemplate},
+        { field: 'taskId',displayName: '操作', width: '15%', cellTemplate:runing_cellTemplate},
         { field: 'id', displayName: '实例ID',type: 'text', width: '10%',cellTooltip: true},
         { field: 'name', displayName: '实例名称',type: 'text', width: '10%',cellTooltip: true},
         { field: 'definitionId', displayName: '流程定义ID',type: 'text', width: '10%',cellTooltip: true},
@@ -270,20 +270,25 @@ function WorkflowController ($scope,$http,$state,layer,Upload) {
         window.open('/modeler.html?modelId='+row.entity.id,'_blank');
     };
     $scope.edit = function(row){
-    	
-    	//tab层
-        layer.tab({
-            area: ['800px', '400px'],
-            tab: [{
-                title: '查询任务', 
-                content: '退单号：100000000000112'
-            }, {
-                title: '指派任务', 
-                content: '选择处理人：默认是自己'
-            }, {
-                title: '完成任务', 
-                content:'处理人：XXX  处理结果:完成'
-            }]
+    	alert(row.entity.taskId);
+    	layer.confirm('将任务分派给当前用户处理任务？', {
+            btn: ['取消', '确认'],
+            btn2: function(index, layero){
+                var result =  $http({
+                    url:'/api/workflow/complete',
+                    method:'POST',
+                    params: {
+                    	taskId:row.entity.taskId,
+                    	keys: [],
+                    	values: []
+                    }
+                });
+                result.then(function(response){
+                	 layer.msg('处理成功，任务ID：'+taskId, {icon: 5});
+                });
+            }
+        }, function(index, layero){
+            layer.close(index);
         });
         
     }
@@ -296,7 +301,7 @@ function WorkflowController ($scope,$http,$state,layer,Upload) {
                     method:'GET'
                 });
                 result.then(function(response){
-                    var data=resp.data;
+                    var data=response.data;
                     if(data.success){
                         initData();
                         layer.msg('部署成功，部署ID：'+data.id, {icon: 5});

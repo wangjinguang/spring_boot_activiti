@@ -189,7 +189,7 @@ public class ActivitiResource {
     		candidateGroups.add(ru.getRole().getName());
     	}
 		List<Task> task=taskService.createTaskQuery().taskCandidateGroupIn(candidateGroups).list();
-        log.info("candidateUser method result="+task);
+        log.info("runingProcess method result="+task);
         for (Task t : task) {
             if(StringUtils.isEmpty(t.getAssignee()) || t.getAssignee().equals(""+userService.getUserWithAuthorities().getId())){
 	            List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceId(t.getProcessInstanceId()).list();
@@ -202,7 +202,7 @@ public class ActivitiResource {
 	                map.put("activityId",processInstance.getActivityId());
 	                map.put("nodeName","");
 	                map.put("suspended",processInstance.isSuspended());
-	
+	                map.put("taskId",t.getId());
 	                //取当前节点
 	                ProcessDefinitionEntity entity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService).getProcessDefinition(processInstance.getProcessDefinitionId());
 	                for (ActivityImpl bean :entity.getActivities()){
@@ -211,8 +211,9 @@ public class ActivitiResource {
 	                        Map<String, Object> variables = entity.getVariables();
 	                        map.put("refundOrderCode",variables == null ?"":String.valueOf(variables.get("refundOrderCode")));
 	                    }
+	                    log.info("runingProcess method ActivityImpl="+bean);
 	                }
-	                
+	                log.info("runingProcess method processInstance="+processInstance);
 	                list.add(map);
 	            }
             }
